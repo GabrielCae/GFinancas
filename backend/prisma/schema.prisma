@@ -20,7 +20,7 @@ model Transaction {
   id          Int      @id @default(autoincrement())
   title       String
   amount      Float
-  type        String   // 'income' | 'expense'
+  type        String   // 'despesa' | 'depósito'
   category    String
   date        DateTime @default(now())
   user        User     @relation(fields: [userId], references: [id])
