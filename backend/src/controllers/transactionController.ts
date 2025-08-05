@@ -1,6 +1,8 @@
 import { type Request, type Response } from "express"
 import { prisma } from "../prisma/client"
 
+import { transactionSchema } from "../schemas/transactionSchema"
+
 interface AuthRequest extends Request {
     userId?: number
 }
@@ -21,15 +23,16 @@ export const getTransactions = async (req: AuthRequest, res: Response) => {
 }
 
 export const createTransaction = async (req: AuthRequest, res: Response) => {
-    if (!req.body)
-        return res.status(500).json({ error: "Informações insuficientes para criar uma transação" })
-    
-    const { title, amount, type, category } = req.body
-
-    if (!title || !amount || !type || !category)
-        return res.status(500).json({ error: "Informações insuficientes para criar uma transação" })
-
     try {
+        const validation = transactionSchema.safeParse(req.body)
+        if (!validation.success)
+            return res.status(400).json({
+                errors: validation.error!.issues.map(e => ({
+                    field: e.path[0],
+                    message: e.message
+                }))
+            })
+        const { title, amount, type, category } = validation.data
 
         const transaction = await prisma.transaction.create({
             data: {

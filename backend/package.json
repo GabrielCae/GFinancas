@@ -19,7 +19,8 @@
     "jsonwebtoken": "^9.0.2",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "zod": "^4.0.14"
   },
   "exports": "./dist/index.js",
   "devDependencies": {

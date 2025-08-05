@@ -3,12 +3,22 @@ import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import { prisma } from "../prisma/client"
 
+import { registerSchema, loginSchema } from "../schemas/authSchema"
+
 const JWT_SECRET = process.env.JWT_SECRET || "secret"
 
 export const register = async (req: Request, res: Response) => {
-    const { name, email, password } = req.body
-
     try {
+
+        const validation = registerSchema.safeParse(req.body)
+        if (!validation.success)
+            return res.status(400).json({
+                errors: validation.error!.issues.map(e => ({
+                    field: e.path[0],
+                    message: e.message
+                }))
+            })
+        const { name, email, password } = validation.data
 
         const existingUser = await prisma.user.findUnique({ where: { email } })
         if (existingUser)
@@ -28,9 +38,17 @@ export const register = async (req: Request, res: Response) => {
 }
 
 export const login = async (req: Request, res: Response) => {
-    const { email, password } = req.body
-
     try {
+        
+        const validation = loginSchema.safeParse(req.body)
+        if (!validation.success)
+            return res.status(400).json({
+                errors: validation.error!.issues.map(e => ({
+                    field: e.path[0],
+                    message: e.message
+                }))
+            })
+        const { email, password } = validation.data
 
         const user = await prisma.user.findUnique({ where: { email } })
         if (!user) return res.status(401).json({ error: "Usuário não encontrado" })

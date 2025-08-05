@@ -21,7 +21,7 @@ model Transaction {
   title       String
   amount      Float
   type        String   // 'despesa' | 'depósito'
-  category    String
+  category    String   @default("Sem categoria")
   date        DateTime @default(now())
   user        User     @relation(fields: [userId], references: [id])
   userId      Int
